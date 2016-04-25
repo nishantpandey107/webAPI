@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Default Page</title>
+	<meta charset="utf-8" />
+	<link href="Content/bootstrap.min.css" rel="stylesheet" />
+	<script src="Scripts/jquery-1.10.2.min.js"></script>
+	<script>
+		$(function () {
+
+			var headersConfig = function () {
+				if (accessToken) { return { "Authorization": "bearer " + accessToken }; }
+			}
+
+			var getData = function () {
+				var url = "http://localhost:46174/api/values";
+				//$.get(url).always(renderData);
+				alert("Data\n" + JSON.stringify(headersConfig(), null, 5));
+				$.ajax(url, { type: "GET", headers: headersConfig() }).always(renderData);
+				return false;
+			}
+
+
+			var registerUser = function () {
+
+				//var url = "http://localhost:46174/api/account/register";
+				var url = "/api/account/register";
+				var data = $("#registerForm").serialize();
+				$.post(url, data).always(renderData);
+				return false;
+			}
+
+			var captureAccessToken = function (result) {
+				accessToken = result.access_token;
+			}
+
+			var loginUser = function () {
+				var url = "http://localhost:46174/token";
+				var data = $("#loginForm").serialize();
+				data = data + "&grant_type=password";
+				alert(data);
+				$.post(url,data).always(renderData).success(captureAccessToken);
+				return false;
+			}
+
+			var renderData = function (result) {
+				$("#renderData").text(JSON.stringify(result, null, 5));
+			}
+
+			var accessToken = "";
+			$("#registerButton").click(registerUser);
+			$("#loginButton").click(loginUser);
+			$("#getDataButton").click(getData);
+		});
+	</script>
+</head>
+<body>
+	<div class="row">
+		<div class="col-lg-5" style="margin-left:65px; margin-top:10px; margin-right:5px;">
+			<h1>Login</h1>
+			<form id="loginForm">
+				<div class="form-group">
+					<label>Email</label>
+					<input name="userName" id="userName" value=".com" class="form-control" placeholder="Email...." />
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<input name="password" id="password" value="Pass@1" class="form-control" placeholder="Password...." />
+				</div>
+				<div class="form-group">
+					<button id="loginButton" class="btn btn-primary">Login</button>
+				</div>
+			</form>
+		</div>
+		<div class="col-lg-5" style="margin-left:125px; margin-top:10px; margin-right:5px;">
+			<h1>Register User</h1>
+			<form id="registerForm">
+				<div class="form-group">
+					<label>Email</label>
+					<input name="email" id="email" class="form-control" type="text" value=".com" placeholder="Email...." />
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<input name="password" id="password" class="form-control" type="text" value="Pass@1" placeholder="Password...." />
+				</div>
+				<div class="form-group">
+					<label>Confirm Password</label>
+					<input name="confirmPassword" id="confirmPassword" class="form-control" type="text" value="Pass@1" placeholder="Password...." />
+				</div>
+				<div class="form-group">
+					<button id="registerButton" class="btn btn-primary">Register</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row" style="margin-left:25px; margin-right:25px;">
+		<div class="well">
+			<button id="getDataButton" class="btn btn-primary">Get Data</button>
+			<h4>Output</h4>
+			<pre id="renderData"></pre>
+		</div>
+	</div>
+</body>
+</html>
